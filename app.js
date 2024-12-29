@@ -1,23 +1,33 @@
 $(document).ready(function() {
+    // Fetch and display posts from the server
+    function fetchPosts() {
+        $.get('/posts', function(posts) {
+            $('#posts-container').empty();
+            posts.forEach(function(post) {
+                var postElement = `
+                    <div class="post">
+                        <div class="content">${post.content}</div>
+                        <div class="actions">
+                            <button class="like-btn">Like</button>
+                        </div>
+                    </div>
+                `;
+                $('#posts-container').prepend(postElement);
+            });
+        });
+    }
+
+    // Fetch posts when the page loads
+    fetchPosts();
+
     // When the post button is clicked
     $('#post-btn').click(function() {
         var postContent = $('#new-post').val();
         if (postContent) {
-            // Create a new post element
-            var postElement = `
-                <div class="post">
-                    <div class="content">${postContent}</div>
-                    <div class="actions">
-                        <button class="like-btn">Like</button>
-                    </div>
-                </div>
-            `;
-            
-            // Append the new post to the posts container
-            $('#posts-container').prepend(postElement);
-            
-            // Clear the input field
-            $('#new-post').val('');
+            $.post('/posts', { content: postContent }, function(post) {
+                fetchPosts(); // Refresh the posts
+                $('#new-post').val(''); // Clear the input
+            });
         }
     });
 
